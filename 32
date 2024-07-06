@@ -1,0 +1,36 @@
+// Person.cs
+public abstract class Person
+{
+    public string Name { get; set; }
+}
+
+// Interface.cs
+public interface KPI
+{
+    void kpi();
+}
+
+// Student.cs
+public class Student : Person, KPI
+{
+    public string Major { get; set; }
+
+    public void kpi()
+    {
+        Console.WriteLine($"Student {Name} is in the {Major} department.");
+    }
+}
+
+// Program.cs
+class Program
+{
+    static void Main(string[] args)
+    {
+        Person obs = new Student { Name = "Nguyễn Văn Nam", Major = "ICT" };
+
+        if (obs is Student student)
+        {
+            student.kpi();
+        }
+    }
+}
