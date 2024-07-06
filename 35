@@ -1,0 +1,43 @@
+public abstract class Shape
+{
+    private int soDinh;
+
+    public int SoDinh
+    {
+        get { return soDinh; }
+        set
+        {
+            if (value <= 0)
+            {
+                throw new ArgumentException("So dinh phai lon hon 0.");
+            }
+            soDinh = value;
+        }
+    }
+}
+
+// TamGiac.cs
+public class TamGiac : Shape
+{
+    public TamGiac()
+    {
+        SoDinh = 3;
+    }
+}
+
+// Program.cs
+class Program
+{
+    static void Main(string[] args)
+    {
+        try
+        {
+            TamGiac tg = new TamGiac();
+            Console.WriteLine($"Tam giac co so dinh: {tg.SoDinh}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Loi: {ex.Message}");
+        }
+    }
+}
