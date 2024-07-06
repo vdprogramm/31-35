@@ -1,0 +1,154 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+public class SinhVien
+{
+    public string MSSV { get; set; }
+    public string HoTen { get; set; }
+    public double DiemToan { get; set; }
+    public double DiemLy { get; set; }
+    public double DiemHoa { get; set; }
+
+    public double DiemTrungBinh => (DiemToan + DiemLy + DiemHoa) / 3;
+}
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        List<SinhVien> danhSachSinhVien = new List<SinhVien>();
+
+        int soLuongSinhVien = NhapSoLuongSinhVien();
+        NhapThongTinSinhVien(danhSachSinhVien, soLuongSinhVien);
+        HienThiThongTinSinhVien(danhSachSinhVien);
+        HienThiSinhVienDiemCao(danhSachSinhVien);
+        Console.WriteLine($"So sinh vien co diem trung binh > 5.0: {DemSinhVienDiemTren5(danhSachSinhVien)}");
+        SapXepSinhVienTheoDiem(danhSachSinhVien);
+        SapXepSinhVienTheoTen(danhSachSinhVien);
+
+        Console.Write("Nhap ten file de ghi thong tin sinh vien: ");
+        string tenFile = Console.ReadLine();
+        GhiThongTinSinhVien(tenFile, danhSachSinhVien);
+        List<SinhVien> sinhVienTuFile = DocThongTinSinhVien(tenFile);
+        HienThiThongTinSinhVien(sinhVienTuFile);
+    }
+
+    static int NhapSoLuongSinhVien()
+    {
+        while (true)
+        {
+            Console.Write("Nhap so luong sinh vien: ");
+            try
+            {
+                int soLuong = int.Parse(Console.ReadLine());
+                if (soLuong <= 0) throw new Exception("So luong sinh vien phai lon hon 0.");
+                return soLuong;
+            }
+            catch (Exception ex) { Console.WriteLine($"Loi: {ex.Message}"); }
+        }
+    }
+
+    static void NhapThongTinSinhVien(List<SinhVien> danhSach, int soLuong)
+    {
+        for (int i = 0; i < soLuong; i++)
+        {
+            SinhVien sv = new SinhVien();
+            Console.Write("Nhap MSSV: "); sv.MSSV = Console.ReadLine();
+            Console.Write("Nhap Ho Ten: "); sv.HoTen = Console.ReadLine();
+            sv.DiemToan = NhapDiem("Toan");
+            sv.DiemLy = NhapDiem("Ly");
+            sv.DiemHoa = NhapDiem("Hoa");
+            danhSach.Add(sv);
+        }
+    }
+
+    static double NhapDiem(string monHoc)
+    {
+        while (true)
+        {
+            Console.Write($"Nhap diem {monHoc}: ");
+            try
+            {
+                double diem = double.Parse(Console.ReadLine());
+                if (diem < 0 || diem > 10) throw new Exception("Diem phai trong khoang tu 0 den 10.");
+                return diem;
+            }
+            catch (Exception ex) { Console.WriteLine($"Loi: {ex.Message}"); }
+        }
+    }
+
+    static void HienThiThongTinSinhVien(List<SinhVien> danhSach)
+    {
+        foreach (var sv in danhSach)
+        {
+            Console.WriteLine($"MSSV: {sv.MSSV}, Ho Ten: {sv.HoTen}, Diem Trung Binh: {sv.DiemTrungBinh:F2}");
+        }
+    }
+
+    static void HienThiSinhVienDiemCao(List<SinhVien> danhSach)
+    {
+        foreach (var sv in danhSach)
+        {
+            if (sv.DiemTrungBinh > 9.5)
+            {
+                Console.WriteLine($"Sinh vien co diem trung binh > 9.5: MSSV: {sv.MSSV}, Ho Ten: {sv.HoTen}, Diem Trung Binh: {sv.DiemTrungBinh:F2}");
+                break;
+            }
+        }
+    }
+
+    static int DemSinhVienDiemTren5(List<SinhVien> danhSach)
+    {
+        int count = 0;
+        foreach (var sv in danhSach)
+        {
+            if (sv.DiemTrungBinh > 5.0) count++;
+        }
+        return count;
+    }
+
+    static void SapXepSinhVienTheoDiem(List<SinhVien> danhSach)
+    {
+        danhSach.Sort((sv1, sv2) => sv1.DiemTrungBinh.CompareTo(sv2.DiemTrungBinh));
+    }
+
+    static void SapXepSinhVienTheoTen(List<SinhVien> danhSach)
+    {
+        danhSach.Sort((sv1, sv2) => string.Compare(sv1.HoTen, sv2.HoTen, StringComparison.Ordinal));
+    }
+
+    static void GhiThongTinSinhVien(string tenFile, List<SinhVien> danhSach)
+    {
+        using (StreamWriter writer = new StreamWriter(tenFile))
+        {
+            foreach (var sv in danhSach)
+            {
+                writer.WriteLine($"{sv.MSSV},{sv.HoTen},{sv.DiemToan},{sv.DiemLy},{sv.DiemHoa},{sv.DiemTrungBinh:F2}");
+            }
+        }
+    }
+
+    static List<SinhVien> DocThongTinSinhVien(string tenFile)
+    {
+        List<SinhVien> danhSach = new List<SinhVien>();
+        using (StreamReader reader = new StreamReader(tenFile))
+        {
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                string[] parts = line.Split(',');
+                SinhVien sv = new SinhVien
+                {
+                    MSSV = parts[0],
+                    HoTen = parts[1],
+                    DiemToan = double.Parse(parts[2]),
+                    DiemLy = double.Parse(parts[3]),
+                    DiemHoa = double.Parse(parts[4])
+                };
+                danhSach.Add(sv);
+            }
+        }
+        return danhSach;
+    }
+}
